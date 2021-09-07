@@ -45,20 +45,23 @@ DROP TABLE IF EXISTS "customer";
 
 CREATE TABLE IF NOT EXISTS "customer"
 (
+ "cust_id"       int NOT NULL,
  "customer_id"   varchar(8) NOT NULL,
  "customer_name" varchar(22) NOT NULL,
  "segment"       varchar(11) NOT NULL,
- CONSTRAINT "PK_41" PRIMARY KEY ( "customer_id" )
+ CONSTRAINT "PK_41" PRIMARY KEY ( "cust_id" )
 );
+
 
 --deleting rows
 truncate table customer;
 
 --inserting table customer
-
-
+insert into customer 
+select 100+row_number() over(), customer_id, customer_name, segment from (select distinct customer_id, customer_name, segment from orders o) tmp;
+	
 --checking table customer
-
+select * from customer c 
 
 -- ***************************************************;
 
@@ -73,6 +76,15 @@ CREATE TABLE IF NOT EXISTS "shipping"
  CONSTRAINT "PK_28" PRIMARY KEY ( "ship_id" )
 );
 
+--deleting rows shipping
+truncate table shipping;
+
+--inserting talbe shipping
+insert into shipping 
+select 100+row_number() over(), ship_mode from (select distinct ship_mode from orders) tmp;
+
+--check table shipping 
+select * from shipping s;
 
 -- ***************************************************;
 
@@ -82,14 +94,23 @@ DROP TABLE IF EXISTS "product";
 
 CREATE TABLE IF NOT EXISTS "product"
 (
- "product_id"   int NOT NULL,
+ "prod_id"   int NOT NULL,
  "category"     varchar(15) NOT NULL,
  "sub_category" varchar(11) NOT NULL,
  "product_name" varchar(127) NOT NULL,
- CONSTRAINT "PK_22" PRIMARY KEY ( "product_id" )
+ "product_id"   varchar(15) NOT NULL,
+ CONSTRAINT "PK_22" PRIMARY KEY ( "prod_id" )
 );
 
+--deleting rows product
+truncate table product;
 
+--inserting talbe product
+insert into product 
+select 100+row_number() over(), category, subcategory, product_name, product_id from (select distinct category, subcategory, product_name, product_id from orders) tmp;
+
+--check table product 
+select * from product p;
 
 -- ***************************************************;
 
@@ -100,16 +121,24 @@ DROP TABLE IF EXISTS "geography";
 CREATE TABLE IF NOT EXISTS "geography"
 (
  "geo_id"      int NOT NULL,
- "сountry"     varchar(13) NOT NULL,
+ "country"     varchar(13) NOT NULL,
  "city"        varchar(17) NOT NULL,
  "state"       varchar(20) NOT NULL,
- "postal_code" int4range NULL,
+ "postal_code" integer NULL,
  "region"      varchar(7) NOT NULL,
- "person"      varchar(17) NOT NULL,
  CONSTRAINT "PK_10" PRIMARY KEY ( "geo_id" )
 );
 
 
+--deleting rows geography
+truncate table geography;
+
+--insert table geography
+insert into geography 
+select 100+row_number() over(), country, city, state, postal_code, region from (select distinct country, city, state, postal_code, region from orders) tmp;
+
+--check table geography
+select * from geography;
 
 -- ***************************************************;
 
