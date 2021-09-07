@@ -6,17 +6,21 @@ DROP TABLE IF EXISTS "calendar";
 
 CREATE TABLE IF NOT EXISTS "calendar"
 (
- "order_date" date NOT NULL,
- "ship_date"  date NOT NULL,
- "year"       int4range NOT NULL,
- "quater"     varchar(5) NOT NULL,
- "month"      int4range NOT NULL,
- "week"       int4range NOT NULL,
- "week_day"   int4range NOT NULL,
- CONSTRAINT "PK_46" PRIMARY KEY ( "order_date", "ship_date" )
+ "date_id"  int NOT NULL,
+ "year"     int NOT NULL,
+ "quarter"  int NOT NULL,
+ "month"    int NOT NULL,
+ "week"     int NOT NULL,
+ "date"     date NOT NULL,
+ "week_day" varchar(20) NOT NULL,
+ "leap"  varchar(20) NOT NULL,
+ CONSTRAINT "PK_99" PRIMARY KEY ( "date_id" )
 );
 
---
+--deleteing rows calendar
+truncate table calendar
+
+--inserting table calendar
 insert into calendar 
 select 
 to_char(date,'yyyymmdd')::int as date_id,  
@@ -34,8 +38,9 @@ to_char(date,'yyyymmdd')::int as date_id,
                        date '2030-01-01',
                        interval '1 day')
        as t(date);
---checking
-select * from calendar_dim; 
+
+--checking table calendar
+select * from calendar; 
 
 -- ***************************************************;
 
@@ -140,62 +145,27 @@ select 100+row_number() over(), country, city, state, postal_code, region from (
 --check table geography
 select * from geography;
 
+
 -- ***************************************************;
 
 DROP TABLE IF EXISTS "sales_fact";
-
-
 
 -- ************************************** "sales_fact"
 
 CREATE TABLE IF NOT EXISTS "sales_fact"
 (
- "row_id"      int4range NOT NULL,
- "order_id"    varchar(14) NOT NULL,
- "geo_id"      int NOT NULL,
- "sales"       numeric(9, 4) NOT NULL,
- "quantity"    int4range NOT NULL,
- "discount"    numeric(4, 2) NOT NULL,
- "profit"      numeric(21, 16) NOT NULL,
- "product_id"  int NOT NULL,
- "ship_id"     int NOT NULL,
- "customer_id" varchar(8) NOT NULL,
- "order_date"  date NOT NULL,
- "ship_date"   date NOT NULL,
- CONSTRAINT "PK_32" PRIMARY KEY ( "row_id" ),
- CONSTRAINT "FK_49" FOREIGN KEY ( "geo_id" ) REFERENCES "geography" ( "geo_id" ),
- CONSTRAINT "FK_52" FOREIGN KEY ( "product_id" ) REFERENCES "product" ( "product_id" ),
- CONSTRAINT "FK_55" FOREIGN KEY ( "ship_id" ) REFERENCES "shipping" ( "ship_id" ),
- CONSTRAINT "FK_61" FOREIGN KEY ( "customer_id" ) REFERENCES "customer" ( "customer_id" ),
- CONSTRAINT "FK_65" FOREIGN KEY ( "order_date", "ship_date" ) REFERENCES "calendar" ( "order_date", "ship_date" )
+ "row_id"        int4range NOT NULL,
+ "order_id"      varchar(14) NOT NULL,
+ "geo_id"        int NOT NULL,
+ "sales"         numeric(9, 4) NOT NULL,
+ "quantity"      int4range NOT NULL,
+ "discount"      numeric(4, 2) NOT NULL,
+ "profit"        numeric(21, 16) NOT NULL,
+ "prod_id"       int NOT NULL,
+ "ship_id"       int NOT NULL,
+ "cust_id"       int NOT NULL,
+ "date_id"       int NOT NULL,
+ "order_date_id" integer NOT NULL,
+ "ship_date_id"  integer NOT NULL,
+ CONSTRAINT "PK_101" PRIMARY KEY ( "row_id" )
 );
-
-CREATE INDEX "fkIdx_51" ON "sales_fact"
-(
- "geo_id"
-);
-
-CREATE INDEX "fkIdx_54" ON "sales_fact"
-(
- "product_id"
-);
-
-CREATE INDEX "fkIdx_57" ON "sales_fact"
-(
- "ship_id"
-);
-
-CREATE INDEX "fkIdx_63" ON "sales_fact"
-(
- "customer_id"
-);
-
-CREATE INDEX "fkIdx_68" ON "sales_fact"
-(
- "order_date",
- "ship_date"
-);
-
-
-
-
