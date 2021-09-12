@@ -140,10 +140,36 @@ truncate table geography;
 
 --insert table geography
 insert into geography 
-select 100+row_number() over(), country, city, state, postal_code, region from (select distinct country, city, state, postal_code, region from orders) tmp;
+select 
+	100+row_number() over(), 
+	country, 
+	city, 
+	state,
+	postal_code,
+	region
+	from (
+		select distinct country, city, state, postal_code, region from orders
+		) tmp;
 
 --check table geography
 select * from geography;
+
+select distinct country, city, state, postal_code from geography g 
+where country is null or city is null or postal_code is null;
+
+-- City Burlington, Vermont doesn't have postal code
+update geography 
+set postal_code = '05401'
+where city = 'Burlington'  and postal_code is null;
+
+--also update source file
+update orders
+set postal_code = '05401'
+where city = 'Burlington'  and postal_code is null;
+
+
+select * from geography g 
+where city = 'Burlington'
 
 
 -- ***************************************************;
@@ -154,11 +180,11 @@ DROP TABLE IF EXISTS "sales_fact";
 
 CREATE TABLE IF NOT EXISTS "sales_fact"
 (
- "row_id"        int4range NOT NULL,
+ "row_id"        int NOT NULL,
  "order_id"      varchar(14) NOT NULL,
  "geo_id"        int NOT NULL,
  "sales"         numeric(9, 4) NOT NULL,
- "quantity"      int4range NOT NULL,
+ "quantity"      integer NOT NULL,
  "discount"      numeric(4, 2) NOT NULL,
  "profit"        numeric(21, 16) NOT NULL,
  "prod_id"       int NOT NULL,
@@ -169,3 +195,45 @@ CREATE TABLE IF NOT EXISTS "sales_fact"
  "ship_date_id"  integer NOT NULL,
  CONSTRAINT "PK_101" PRIMARY KEY ( "row_id" )
 );
+
+--deleting rows sales_fact
+truncate table sales_fact;
+
+--insert table sales_fact
+insert into sales_fact
+select 
+	100+row_number() over(),
+	o.order_id,
+	geo_id,
+	sales,
+	quantity 
+	,discount 
+	,profit 
+	,prod_id 
+	,ship_id 
+	,cust_id 
+	,date_id 
+	,to_char(order_date,'yyyymmdd')::int as  order_date_id
+	,to_char(ship_date,'yyyymmdd')::int as  ship_date_id
+from orders o
+inner join calendar cl
+on o.order_date = cl."date" 
+inner join customer c 
+on o.customer_name = c.customer_name and o.segment = c.segment and o.customer_id = c.customer_id
+inner join shipping s 
+on o.ship_mode  = s.ship_mode
+inner join product p 
+on o.category = p.category and o.subcategory = p.sub_category and o.product_name = p.product_name and o.product_id = p.product_id
+inner join geography g 
+on g.country = o.country and o.city = g.city and o.state = g.state and o.postal_code = g.postal_code and o.region = g.region;
+
+--check table sales_fact
+select * from sales_fact;
+
+--do you get 9994rows?
+select count(*) from sales_fact sf
+inner join shipping s on sf.ship_id=s.ship_id
+inner join geography g on sf.geo_id=g.geo_id
+inner join product p on sf.prod_id=p.prod_id
+inner join customer cd on sf.cust_id=cd.cust_id;
+
