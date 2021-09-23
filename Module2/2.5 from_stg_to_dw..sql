@@ -1,11 +1,11 @@
 create schema dw;
 -- ***************************************************;
 
-DROP TABLE IF EXISTS "dw.calendar";
+DROP TABLE IF EXISTS dw.calendar;
 
 -- ************************************** "calendar"
 
-CREATE TABLE IF NOT EXISTS "dw.calendar"
+CREATE TABLE IF NOT EXISTS dw.calendar
 (
  "date_id"  int NOT NULL,
  "year"     int NOT NULL,
@@ -45,11 +45,11 @@ select * from dw.calendar;
 
 -- ***************************************************;
 
-DROP TABLE IF EXISTS "dw.customer";
+DROP TABLE IF EXISTS dw.customer;
 
 -- ************************************** "customer"
 
-CREATE TABLE IF NOT EXISTS "dw.customer"
+CREATE TABLE IF NOT EXISTS dw.customer
 (
  "cust_id"       int NOT NULL,
  "customer_id"   varchar(8) NOT NULL,
@@ -71,11 +71,11 @@ select * from dw.customer c
 
 -- ***************************************************;
 
-DROP TABLE IF EXISTS "dw.shipping";
+DROP TABLE IF EXISTS dw.shipping;
 
 -- ************************************** "shipping"
 
-CREATE TABLE IF NOT EXISTS "dw.shipping"
+CREATE TABLE IF NOT EXISTS dw.shipping
 (
  "ship_id"   int NOT NULL,
  "ship_mode" varchar(14) NOT NULL,
@@ -94,11 +94,11 @@ select * from dw.shipping s;
 
 -- ***************************************************;
 
-DROP TABLE IF EXISTS "dw.product";
+DROP TABLE IF EXISTS dw.product;
 
 -- ************************************** "product"
 
-CREATE TABLE IF NOT EXISTS "dw.product"
+CREATE TABLE IF NOT EXISTS dw.product
 (
  "prod_id"   int NOT NULL,
  "category"     varchar(15) NOT NULL,
@@ -116,21 +116,21 @@ insert into dw.product
 select 100+row_number() over(), category, subcategory, product_name, product_id from (select distinct category, subcategory, product_name, product_id from stg.orders) tmp;
 
 --check table product 
-select * from product p;
+select * from dw.product p;
 
 -- ***************************************************;
 
-DROP TABLE IF EXISTS "dw.geography";
+DROP TABLE IF EXISTS dw.geography;
 
 -- ************************************** "geography"
 
-CREATE TABLE IF NOT EXISTS "dw.geography"
+CREATE TABLE IF NOT EXISTS dw.geography
 (
  "geo_id"      int NOT NULL,
  "country"     varchar(13) NOT NULL,
  "city"        varchar(17) NOT NULL,
  "state"       varchar(20) NOT NULL,
- "postal_code" integer NULL,
+ "postal_code" varchar(20) NULL,
  "region"      varchar(7) NOT NULL,
  CONSTRAINT "PK_10" PRIMARY KEY ( "geo_id" )
 );
@@ -175,11 +175,11 @@ where city = 'Burlington'
 
 -- ***************************************************;
 
-DROP TABLE IF EXISTS "dw.sales_fact";
+DROP TABLE IF EXISTS dw.sales_fact;
 
 -- ************************************** "sales_fact"
 
-CREATE TABLE IF NOT EXISTS "dw.sales_fact"
+CREATE TABLE IF NOT EXISTS dw.sales_fact
 (
  "row_id"        int NOT NULL,
  "order_id"      varchar(14) NOT NULL,
